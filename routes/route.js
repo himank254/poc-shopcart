@@ -144,6 +144,4 @@ router.delete('/deletefrom-cart/:id', cart_auth, async(req, res) => {
 })
 
 
-
-
 module.exports = router

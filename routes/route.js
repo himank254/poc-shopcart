@@ -25,14 +25,14 @@ router.post('/register', (req, res) => {
         username: req.body.username 
     })
     user.save().then(()=> {
-        res.send("Registered Successfully")
+        res.status(201).send("Registered Successfully")
         cart.save().then(()=> {
             console.log("Cart Added Successfully")
         }).catch((e) => {
             console.log(e)
         })
     }).catch((e) => {
-        res.status(400).send(e)
+        res.status(406).send(e)
     })  
 })
 
@@ -41,12 +41,12 @@ router.post('/login', async (req, res) => {
 
         const val_res = schema.validate(req.body)
         if(val_res.error){
-            res.send("Both Fields are required")
+            res.status(406).send("Both Fields are required")
         }
         else{
             const userList = await User.findOne(req.body)
             if (userList == null){
-                res.send("unsuccessfull")
+                res.status(401).send("unsuccessfull")
             }
             else{
                 const token = jwt.sign({id: userList._id}, 'himankkasecrethaiyeh')
@@ -54,7 +54,7 @@ router.post('/login', async (req, res) => {
             }
         }        
     }catch(e){
-        console.log(e)
+        res.status(400).send(e)
     }
 })
 
@@ -63,7 +63,7 @@ router.post('/add-product', auth , (req, res) => {
     
     const product = new Product(req.body)
     product.save().then(()=> {
-        res.send("Product Added Successfully")
+        res.status(201).send("Product Added Successfully")
     }).catch((e) => {
         res.status(400).send(e)
     })  
@@ -92,7 +92,7 @@ router.patch('/update-product/:id',auth, async(req, res) => {
         const updateProduct  = await Product.findByIdAndUpdate(_id, req.body, {
             new: true
         })
-        res.send(updateProduct)
+        res.status(201).send(updateProduct)
     }
     catch(e){
         res.status(400).send(e)
@@ -122,7 +122,7 @@ router.patch('/addto-cart/:id', cart_auth, async(req, res) => {
 })
 
 
-router.patch('/deletefrom-cart/:id', cart_auth, async(req, res) => {
+router.delete('/deletefrom-cart/:id', cart_auth, async(req, res) => {
     try{
         const product_todelete = await Product.findOne({product_name : req.body.product_name})
         if(product_todelete == null){
